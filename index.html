@@ -19,7 +19,7 @@
     <script type="text/javascript">
       function dessineNuageDePoint() {
         $.ajax({
-          url: "exo2.json",
+          url: "dataset.json",
           dataType: "json",
           success: function (data) {
             var points = $("#points");
@@ -28,6 +28,7 @@
             data.forEach(function (item) {
               var valueToMultiple = 10;
               var cx = item.realise * valueToMultiple;
+              //fixed value may be render dynamic
               var cy = 397 - item.joue * valueToMultiple;
 
               var circle = document.createElementNS(
