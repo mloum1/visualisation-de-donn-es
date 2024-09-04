@@ -4,15 +4,76 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualisation de données</title>
-    <!-- le code javascript  mais pour des raisons de clarté celui peut etre séparer dans un fichier qui lui est propre -->
-    <script
-      src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"
-      type="text/javascript"
-    ></script>
+    <style>
+      .tooltip {
+        position: absolute;
+        background: #79b970;
+        border-radius: 5px;
+        padding: 5px;
+        display: none;
+        pointer-events: none;
+        z-index: 10;
+      }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript">
-      // la fonction qui nous permet d'inclure dynamiquement les données dans la squellette pour former le diagramme
+      function dessineNuageDePoint() {
+        $.ajax({
+          url: "exo2.json",
+          dataType: "json",
+          success: function (data) {
+            var points = $("#points");
+            points.empty();
 
-      function dessineNuageDePoint() {}
+            data.forEach(function (item) {
+              var valueToMultiple = 10;
+              var cx = item.realise * valueToMultiple;
+              var cy = 397 - item.joue * valueToMultiple;
+
+              var circle = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+              );
+              $(circle)
+                .attr("cx", cx)
+                .attr("cy", cy)
+                .attr("r", 10)
+                .attr("fill", "orange")
+                .attr("stroke", "orange")
+                .on("mouseover", function (event) {
+                  drawInfobulle(event, item);
+                })
+                .on("mouseleave", function () {
+                  removeInfobulle();
+                });
+
+              points.append(circle);
+            });
+          },
+          error: function () {
+            alert("Erreur de chargement des données ...");
+          },
+        });
+      }
+
+      function drawInfobulle(event, item) {
+        var infobulle = $("#infobulle");
+        infobulle
+          .html(
+            `
+                <strong>${item.nom}</strong><br>
+                Réalisé: ${item.realise}<br>
+                Joué: ${item.joue}<br>
+                Film: ${item.film}
+            `
+          )
+          .css({ left: event.pageX + 10, top: event.pageY + 10 })
+          .show();
+      }
+
+      function removeInfobulle() {
+        $("#infobulle").hide();
+      }
     </script>
   </head>
 
@@ -57,7 +118,7 @@
       </g>
 
       <g id="points" transform="translate(50,50)"></g>
-      <g id="infobulle" transform="translate(50,50)"></g>
+      <div id="infobulle" class="tooltip"></div>
     </svg>
   </body>
 </html>
